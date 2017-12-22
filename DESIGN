@@ -1,0 +1,22 @@
+Systems Level Programming - Final Project
+Pickupbox by Cesar Mu & Alex Shevchenko
+
+Description:
+Dropbox is a popular cloud storage service used by millions. 
+With Pickupbox, we wanted to recreate the main capabilities
+of Dropbox, which are the abilities to upload to, store, and
+download files from a central server. The central server can
+keep track of multiple users, their personal files, and how
+much storage space they have left.
+
+User Interface:
+The UI will be contained in the terminal. The user will first
+provide login info, which will be verified by the server. The
+user can then view their uploaded files through a simple file
+browser ("ls"). 
+
+Technical Design:
+Our project will heavily emphasize networking, pipes,
+processes, and working with files. 
+
+Timeline:
