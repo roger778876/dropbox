@@ -1,3 +1,4 @@
 # Pickupbox
-Systems Level Programming - Final Project
-Cesar Mu & Alex Shevchenko
+**Systems Level Programming - Final Project
+
+by Cesar Mu & Alex Shevchenko
