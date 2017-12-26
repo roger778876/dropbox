@@ -13,10 +13,19 @@ User Interface:
 The UI will be contained in the terminal. The user will first
 provide login info, which will be verified by the server. The
 user can then view their uploaded files through a simple file
-browser ("ls"). 
+browser/list. 
 
 Technical Design:
 Our project will heavily emphasize networking, pipes,
-processes, and working with files. 
+processes, and working with files. The central server and 
+client must establish connections in order to upload and 
+download files. There can also be multiple connections to
+the server from different clients.
+Cesar will work on the server-side processes and Alex will
+work on the client-side.
+We will most likely use arrays and perhaps some special structs.
 
 Timeline:
+1/6: Complete client file browser and basic server capabilities.
+1/10: Finish client capabilities.
+1/13: Finish server capabilities.
