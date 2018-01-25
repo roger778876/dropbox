@@ -38,9 +38,9 @@ int server_connect(int from_client) {
   int to_client;
 
   //reading from wkp to get to client
-  printf("reading from well known pipe...\n");
+  // printf("reading from well known pipe...\n");
   read(from_client, buff, sizeof(buff));
-  printf("server read: %s\n", buff);
+  // printf("server read: %s\n", buff);
 
   //writing to client through private pipe
   to_client = open(buff, O_WRONLY, 0);
@@ -48,14 +48,13 @@ int server_connect(int from_client) {
 
   //completing the handshake by reading from client one last time
   if(read(from_client, buff, sizeof(buff))){
-    printf("server-client connection established\n");
+    return to_client;
   }
   else {
     printf("Handshake not completed!\n");
     remove("luigi");
+    exit(0);
   }
-
-  return to_client;
 }
 
 /*=========================
@@ -112,8 +111,10 @@ int client_handshake(int *to_server) {
   //send pp name to server
   // printf("[client] handshake: connecting to wkp\n");
   *to_server = open( "luigi", O_WRONLY, 0);
-  if ( *to_server == -1 )
+  if ( *to_server == -1 ) {
+    printf("Couldn't connect to PUBServer\n");
     exit(1);
+  }
 
   //make private pipe
   sprintf(buffer, "%d", getpid() );
