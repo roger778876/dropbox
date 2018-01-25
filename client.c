@@ -1,15 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <unistd.h>
-#include <string.h>
 #include "pipe_networking.h"
 #include "startup.c"
 
 int main() {
   startuptext(0);
-
-
   int to_server;
   int from_server;
   char buffer[BUFFER_SIZE];

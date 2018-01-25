@@ -1,5 +1,3 @@
-#include <unistd.h>
-#include <string.h>
 #include "pipe_networking.h"
 
 #define GREEN_TEXT "\x1b[32m"
@@ -19,8 +17,6 @@
 int server_setup() {
   int from_client;
   mkfifo("luigi", 0600);
-  printf(GREEN_TEXT "[PUBServer]" COLOR_RESET);
-  printf(" Waiting for connection...\n");
   from_client = open("luigi", O_RDONLY, 0);
 
   remove("luigi");
@@ -54,6 +50,10 @@ int server_connect(int from_client) {
   if(read(from_client, buff, sizeof(buff))){
     printf("server-client connection established\n");
   }
+  else {
+    printf("Handshake not completed!\n");
+    remove("luigi");
+  }
 
   return to_client;
 }
@@ -75,7 +75,7 @@ int server_handshake(int *to_client) {
 
   mkfifo("luigi", 0600);
 
-  //block on open, receive mesage
+  //block on open, recieve mesage
   printf("[server] handshake: making wkp\n");
   from_client = open( "luigi", O_RDONLY, 0);
   read(from_client, buffer, sizeof(buffer));
@@ -105,11 +105,12 @@ int server_handshake(int *to_client) {
   returns the file descriptor for the downstream pipe.
   =========================*/
 int client_handshake(int *to_server) {
+
   int from_server;
   char buffer[HANDSHAKE_BUFFER_SIZE];
 
   //send pp name to server
-  printf("[client] handshake: connecting to wkp\n");
+  // printf("[client] handshake: connecting to wkp\n");
   *to_server = open( "luigi", O_WRONLY, 0);
   if ( *to_server == -1 )
     exit(1);
@@ -124,14 +125,16 @@ int client_handshake(int *to_server) {
   from_server = open(buffer, O_RDONLY, 0);
   read(from_server, buffer, sizeof(buffer));
   /*validate buffer code goes here */
-  printf("[client] handshake: received [%s]\n", buffer);
+  // printf("[client] handshake: received [%s]\n", buffer);
 
   //remove pp
   remove(buffer);
-  printf("[client] handshake: removed pp\n");
+  // printf("[client] handshake: removed pp\n");
 
   //send ACK to server
   write(*to_server, ACK, sizeof(buffer));
+
+  printf("Ready!\n");
 
   return from_server;
 }
