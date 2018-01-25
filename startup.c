@@ -2,19 +2,27 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-void startuptext() {
+void startuptext(int i) {
   printf("         +--------------+\n        /|             /|\n       / |            / |\n      *--*-----------*  |\n      |              |  |\n      | pickupbox    |  |\n      |              |  |\n   ...|  by Cesar M. |  +......\n  ....|    & Alex S. | /......\n .....|              |/......\n......*--------------*......\n");
-  printf("Pickupbox server loading");
+  if (i) {
+    printf("Pickupbox server loading");
+  }
+  else {
+    printf("Pickupbox client loading");
+  }
   fflush(stdout);
-  usleep(700000);
+  usleep(500000);
   printf(".");
   fflush(stdout);
-  usleep(700000);
+  usleep(500000);
   printf(".");
   fflush(stdout);
-  usleep(700000);
+  usleep(500000);
   printf(".");
   fflush(stdout);
-  usleep(700000);
-  printf("Ready!\n");
+  usleep(500000);
+  if (i) {
+    printf("Ready!\n");
+    usleep(500000);
+  }
 }
