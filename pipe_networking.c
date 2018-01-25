@@ -17,26 +17,15 @@
   returns the file descriptor for the upstream pipe.
   =========================*/
 int server_setup() {
-  int pd; // pipe descriptor
-
-  if (mkfifo("luigi", 0644) == -1) { // Well Known Pipe
-    exit(EXIT_FAILURE);
-  }
-
-  // printf("Waiting for client...\n");
+  int from_client;
+  mkfifo("luigi", 0600);
   printf(GREEN_TEXT "[PUBServer]" COLOR_RESET);
-
-  ////////
   printf(" Waiting for connection...\n");
-  pd = open("luigi", O_RDONLY);
-  if (pd == -1) {
-    printf("Error: %s\n", strerror(errno));
-    remove("luigi");
-    exit(EXIT_FAILURE);
-  }
-  
-  // remove("luigi");
-  return pd;
+  from_client = open("luigi", O_RDONLY, 0);
+
+  remove("luigi");
+
+  return from_client;
 }
 
 
@@ -49,49 +38,23 @@ int server_setup() {
   returns the file descriptor for the downstream pipe.
   =========================*/
 int server_connect(int from_client) {
-  char buf[HANDSHAKE_BUFFER_SIZE];
+  char buff[HANDSHAKE_BUFFER_SIZE];
+  int to_client;
 
-  if (read(from_client, buf, sizeof(buf)) == -1) {
-    printf("Error: %s\n", strerror(errno));
-    // remove("WKP");
-    close(from_client);
-    exit(EXIT_FAILURE);
+  //reading from wkp to get to client
+  printf("reading from well known pipe...\n");
+  read(from_client, buff, sizeof(buff));
+  printf("server read: %s\n", buff);
+
+  //writing to client through private pipe
+  to_client = open(buff, O_WRONLY, 0);
+  write(to_client, buff, sizeof(buff));
+
+  //completing the handshake by reading from client one last time
+  if(read(from_client, buff, sizeof(buff))){
+    printf("server-client connection established\n");
   }
-  // printf("pipe name received: %s\n", buf);
-  // printf("[subserver] handshake: received [%s]\n", buf);
-  
-  // Open the pipe whose name the server received from the client:
-  int to_client = open(buf, O_WRONLY);
-  if (to_client == -1) {
-    printf("Error: %s\n", strerror(errno));
-    // remove("WKP");
-    close(from_client);
-    exit(EXIT_FAILURE);
-  }
-  
-  if (write(to_client, ACK, sizeof(ACK)) == -1) {
-    printf("Error: %s\n", strerror(errno));
-    close(from_client);
-    close(to_client);
-    exit(EXIT_FAILURE);
-  }
-  
-  if (read(from_client, buf, sizeof(buf)) == -1) {
-    printf("Error: %s\n", strerror(errno));
-    close(from_client);
-    close(to_client);
-    exit(EXIT_FAILURE);
-  }
-  
-  if (strncmp(buf, ACK, sizeof(buf)) == 0) {
-    // printf("[subserver] Confirmation message received: \"%s\"\n", buf);
-  } else {
-    printf("[subserver] Error: received message \"%s\" instead of confirmation message \"%s\".\n", buf, ACK);
-    close(from_client);
-    close(to_client);
-    exit(EXIT_FAILURE);
-  }
-  // remove(buf);
+
   return to_client;
 }
 
@@ -142,43 +105,30 @@ int server_handshake(int *to_client) {
   returns the file descriptor for the downstream pipe.
   =========================*/
 int client_handshake(int *to_server) {
-
   int from_server;
   char buffer[HANDSHAKE_BUFFER_SIZE];
 
-  // Name of private pipe (will be pid of client)
-  char ppname[HANDSHAKE_BUFFER_SIZE];
-
   //send pp name to server
+  printf("[client] handshake: connecting to wkp\n");
   *to_server = open( "luigi", O_WRONLY, 0);
   if ( *to_server == -1 )
     exit(1);
 
   //make private pipe
-  sprintf(ppname, "%d", getpid() );
-  mkfifo(ppname, 0600);
+  sprintf(buffer, "%d", getpid() );
+  mkfifo(buffer, 0600);
 
-  write(*to_server, ppname, sizeof(ppname));
+  write(*to_server, buffer, sizeof(buffer));
 
   //open and wait for connection
-  from_server = open(ppname, O_RDONLY, 0);
+  from_server = open(buffer, O_RDONLY, 0);
   read(from_server, buffer, sizeof(buffer));
-  
-  /*validate buffer: */
-  if (strncmp(buffer, ACK, sizeof(buffer)) == 0) {
-    // printf("[subserver] Confirmation message received: \"%s\"\n", buf);
-    // printf("[client] handshake: received [%s]\n", buffer);
-  } else {
-    printf("[client] Error: received message \"%s\" instead of confirmation message \"%s\".\n", buffer, ACK);
-    close(*to_server);
-    close(from_server);
-    exit(EXIT_FAILURE);
-  }
+  /*validate buffer code goes here */
+  printf("[client] handshake: received [%s]\n", buffer);
 
   //remove pp
-  remove(ppname);
-  // printf("[client] handshake: removed pp\n");
-  printf("Ready!\n");
+  remove(buffer);
+  printf("[client] handshake: removed pp\n");
 
   //send ACK to server
   write(*to_server, ACK, sizeof(buffer));
