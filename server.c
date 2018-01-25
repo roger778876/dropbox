@@ -47,11 +47,12 @@ int main() {
   int num_client = 0;
   while (1) {
     from_client = server_setup();
+    printf(GREEN_TEXT "[PUBServer]" COLOR_RESET);
+    printf(" Connected to client %d\n", num_client);
+    num_client++;
     int parent = fork();
     if (parent) {
       remove("luigi");
-      printf(GREEN_TEXT "[PUBServer]" COLOR_RESET);
-      printf(" Connected to client %d\n", num_client);
       close(from_client);
     }
     else {
