@@ -5,3 +5,4 @@
 int to_server;
 int from_server;
 void login();
+void shell();

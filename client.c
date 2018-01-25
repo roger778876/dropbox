@@ -1,5 +1,6 @@
 #include "pipe_networking.h"
 #include "client.h"
+#include "execute.c"
 
 int to_server;
 int from_server;
@@ -9,17 +10,8 @@ int main() {
   from_server = client_handshake( &to_server );
   login();
 
+  shell();
 
-  /*
-  while (1) {
-    printf("enter data: ");
-    fgets(buffer, sizeof(buffer), stdin);
-    *strchr(buffer, '\n') = 0;
-    write(to_server, buffer, sizeof(buffer));
-    read(from_server, buffer, sizeof(buffer));
-    printf("received: [%s]\n", buffer);
-  }
-  */
 }
 
 void login() {
@@ -33,4 +25,18 @@ void login() {
 
   read(from_server, result, sizeof(result));
   printf(GREEN_TEXT "%s\n" COLOR_RESET, result);
+}
+
+void shell() {
+  while (1) {
+    struct cmds_array commands = read_input();
+    int num_cmds = commands.num_cmds;
+    int i = 0;
+    while (num_cmds) {
+      execute(commands.cmds[i]);
+      num_cmds--;
+      i++;
+    }
+    free(commands.cmds);
+  }
 }
