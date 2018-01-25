@@ -21,16 +21,18 @@ static void sighandler(int signo) { // shuts down server when SIGINT
 
 int main() {
   signal(SIGINT, sighandler);
-  startuptext(); // displays logo and loading text
+  startuptext(1); // displays logo and loading text
 
   int from_client;
   int to_client;
+  int num_client = 0;
   while (1) {
     from_client = server_setup();
     int parent = fork();
     if (parent) {
       remove("luigi");
-      printf("[server] handshake: removed wkp\n");
+      printf(GREEN_TEXT "[PUBServer]" COLOR_RESET);
+      printf(" Connected to client %d\n", num_client);
       close(from_client);
     }
     else {
