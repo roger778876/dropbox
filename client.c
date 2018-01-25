@@ -3,7 +3,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <string.h>
-#include "pipe_networking.c"
+#include "pipe_networking.h"
 #include "startup.c"
 
 int main() {
@@ -15,7 +15,7 @@ int main() {
   char buffer[BUFFER_SIZE];
 
   from_server = client_handshake( &to_server );
-  /*
+
   while (1) {
     printf("enter data: ");
     fgets(buffer, sizeof(buffer), stdin);
@@ -24,5 +24,4 @@ int main() {
     read(from_server, buffer, sizeof(buffer));
     printf("received: [%s]\n", buffer);
   }
-  */
 }
