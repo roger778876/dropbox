@@ -7,7 +7,8 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <signal.h>
-#include "input.c"
+#include "input.h"
+#include "execute.h"
 
 void change_dir(char **command) {
   if (chdir(command[1])) {
@@ -19,21 +20,29 @@ void exit_program() {
   kill(getpid(), SIGKILL);
 }
 
+void pubhelp() {
+  printf("Pickupbox commands:\n");
+  printf("pubup [file path] - uploads file to your Pickupbox\n");
+}
+
 void execute(char *command) {
   char **args = separate_args(command);
 
   if (!args[0]) {
     return;
   }
-
   else if (!strcmp(args[0], "cd")) {
     change_dir(args);
   }
-
   else if (!strcmp(args[0], "exit")) {
     exit_program();
   }
+  else if (!strcmp(args[0], "pubhelp")) {
+    pubhelp();
+  }
+  else if (!strcmp(args[0], "pubup")) {
 
+  }
   else {
     int piping = 0;
     for (int i = 0; args[i]; i++) {

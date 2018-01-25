@@ -3,10 +3,10 @@ forking: fserver client
 fserver: forking_server.o pipe_networking.o subserver.o startup.o
 	gcc -o server forking_server.o pipe_networking.o subserver.o startup.o
 
-client: client.o pipe_networking.o startup.o
-	gcc -o client client.o pipe_networking.o startup.o
+client: client.o pipe_networking.o startup.o execute.o input.o
+	gcc -o client client.o pipe_networking.o startup.o execute.o
 
-client.o: client.c pipe_networking.h
+client.o: client.c pipe_networking.h input.o
 	gcc -c client.c
 
 forking_server.o: forking_server.c pipe_networking.h subserver.h
@@ -20,6 +20,12 @@ subserver.o: subserver.c
 
 startup.o: startup.c startup.h
 	gcc -c startup.c
+
+execute.o: execute.c execute.h input.h
+	gcc -c execute.c
+
+input.o: input.c input.h
+	gcc -c input.c
 
 clean:
 	rm -rf *.o

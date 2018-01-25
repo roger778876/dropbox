@@ -1,6 +1,7 @@
 #include "pipe_networking.h"
 #include "client.h"
-#include "execute.c"
+#include "execute.h"
+#include "input.c"
 
 int to_server;
 int from_server;
@@ -9,9 +10,7 @@ int main() {
   startuptext(0);
   from_server = client_handshake( &to_server );
   login();
-
   shell();
-
 }
 
 void login() {
@@ -25,6 +24,7 @@ void login() {
 
   read(from_server, result, sizeof(result));
   printf(GREEN_TEXT "%s\n" COLOR_RESET, result);
+  printf("Type \"pubhelp\" for helpful commands!\n");
 }
 
 void shell() {
