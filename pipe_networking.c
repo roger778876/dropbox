@@ -58,7 +58,7 @@ int server_connect(int from_client) {
     exit(EXIT_FAILURE);
   }
   // printf("pipe name received: %s\n", buf);
-  printf("[subserver] handshake: received [%s]\n", buf);
+  // printf("[subserver] handshake: received [%s]\n", buf);
   
   // Open the pipe whose name the server received from the client:
   int to_client = open(buf, O_WRONLY);
@@ -84,7 +84,7 @@ int server_connect(int from_client) {
   }
   
   if (strncmp(buf, ACK, sizeof(buf)) == 0) {
-    printf("[subserver] Confirmation message received: \"%s\"\n", buf);
+    // printf("[subserver] Confirmation message received: \"%s\"\n", buf);
   } else {
     printf("[subserver] Error: received message \"%s\" instead of confirmation message \"%s\".\n", buf, ACK);
     close(from_client);
@@ -112,7 +112,7 @@ int server_handshake(int *to_client) {
 
   mkfifo("luigi", 0600);
 
-  //block on open, recieve mesage
+  //block on open, receive mesage
   printf("[server] handshake: making wkp\n");
   from_client = open( "luigi", O_RDONLY, 0);
   read(from_client, buffer, sizeof(buffer));
@@ -150,7 +150,6 @@ int client_handshake(int *to_server) {
   char ppname[HANDSHAKE_BUFFER_SIZE];
 
   //send pp name to server
-  printf("Ready!\n");
   *to_server = open( "luigi", O_WRONLY, 0);
   if ( *to_server == -1 )
     exit(1);
@@ -168,7 +167,7 @@ int client_handshake(int *to_server) {
   /*validate buffer: */
   if (strncmp(buffer, ACK, sizeof(buffer)) == 0) {
     // printf("[subserver] Confirmation message received: \"%s\"\n", buf);
-    printf("[client] handshake: received [%s]\n", buffer);
+    // printf("[client] handshake: received [%s]\n", buffer);
   } else {
     printf("[client] Error: received message \"%s\" instead of confirmation message \"%s\".\n", buffer, ACK);
     close(*to_server);
@@ -178,7 +177,8 @@ int client_handshake(int *to_server) {
 
   //remove pp
   remove(ppname);
-  printf("[client] handshake: removed pp\n");
+  // printf("[client] handshake: removed pp\n");
+  printf("Ready!\n");
 
   //send ACK to server
   write(*to_server, ACK, sizeof(buffer));
