@@ -33,7 +33,7 @@ void shell() {
     int num_cmds = commands.num_cmds;
     int i = 0;
     while (num_cmds) {
-      execute(commands.cmds[i]);
+      execute(commands.cmds[i], to_server, from_server);
       num_cmds--;
       i++;
     }

@@ -21,7 +21,7 @@ subserver.o: subserver.c
 startup.o: startup.c startup.h
 	gcc -c startup.c
 
-execute.o: execute.c execute.h input.h
+execute.o: execute.c execute.h input.h pipe_networking.h
 	gcc -c execute.c
 
 input.o: input.c input.h

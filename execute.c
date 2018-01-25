@@ -9,6 +9,10 @@
 #include <signal.h>
 #include "input.h"
 #include "execute.h"
+#include "pipe_networking.h"
+
+int to_server;
+int from_server;
 
 void change_dir(char **command) {
   if (chdir(command[1])) {
@@ -22,11 +26,22 @@ void exit_program() {
 
 void pubhelp() {
   printf("Pickupbox commands:\n");
-  printf("pubup [file path] - uploads file to your Pickupbox\n");
+  printf("publs - shows list of files in your PUB\n");
+  printf("pubup [file path] - uploads file to your PUB\n");
 }
 
-void execute(char *command) {
+void publs() {
+  char input[BUFFER_SIZE] = "publs";
+  char output[BUFFER_SIZE];
+  write(to_server, input, sizeof(input));
+  read(from_server, output, sizeof(output));
+  printf("%s", output);
+}
+
+void execute(char *command, int to_s, int from_s) {
   char **args = separate_args(command);
+  to_server = to_s;
+  from_server = from_s;
 
   if (!args[0]) {
     return;
@@ -39,6 +54,9 @@ void execute(char *command) {
   }
   else if (!strcmp(args[0], "pubhelp")) {
     pubhelp();
+  }
+  else if (!strcmp(args[0], "publs")) {
+    publs();
   }
   else if (!strcmp(args[0], "pubup")) {
 
