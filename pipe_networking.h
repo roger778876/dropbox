@@ -9,6 +9,10 @@
 #include <ctype.h>
 #include <signal.h>
 
+#define RED_TEXT "\x1B[31m"
+#define GREEN_TEXT "\x1b[32m"
+#define COLOR_RESET "\x1b[0m"
+
 
 #ifndef NETWORKING_H
 #define NETWORKING_H

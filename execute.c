@@ -25,9 +25,10 @@ void exit_program() {
 }
 
 void pubhelp() {
-  printf("Pickupbox commands:\n");
+  printf(CYAN_BOLD "Pickupbox commands:\n" COLOR_RESET);
   printf("publs - shows list of files in your PUB\n");
   printf("pubup [file path] - uploads file to your PUB\n");
+  printf("pubdown [file name] - downloads your PUB file to your current directory\n");
 }
 
 void publs() {
@@ -35,6 +36,7 @@ void publs() {
   char output[BUFFER_SIZE];
   write(to_server, input, sizeof(input));
   read(from_server, output, sizeof(output));
+  printf(CYAN_BOLD "Your PUB files:\n" COLOR_RESET);
   printf("%s", output);
 }
 

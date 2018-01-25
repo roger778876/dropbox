@@ -9,9 +9,9 @@ void subserver(int from_client) {
   to_client = server_connect(from_client);
   
   read(from_client, username, sizeof(username));
-  printf(GREEN_TEXT "[PUBServer]" COLOR_RESET);
+  printf(GREEN_BOLD "[PUBServer]" COLOR_RESET);
   printf(" Connected to client \"%s\"\n", username);
-  printf(GREEN_TEXT "[PUBServer]" COLOR_RESET);
+  printf(GREEN_BOLD "[PUBServer]" COLOR_RESET);
   printf(" Waiting for new connection...\n");
 
   user_folder(username);
@@ -53,9 +53,9 @@ void user_folder(char * user) { // creates new folder if necessary
   } 
   else {
     mkdir(user, 0700);
-    char new[BUFFER_SIZE] = "Created new user ";
+    char new[BUFFER_SIZE] = "Created new PUB for ";
     strcat(new, user);
-    strcat(new, "!");
+    strcat(new, ". Welcome!");
     write(to_client, new, sizeof(new));
   }
 }

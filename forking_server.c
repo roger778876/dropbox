@@ -17,7 +17,7 @@ int main() {
   int from_client;
   int parent;
 
-  printf(GREEN_TEXT "[PUBServer]" COLOR_RESET);
+  printf(GREEN_BOLD "[PUBServer]" COLOR_RESET);
   printf(" Waiting for new connection...\n");
   while (1) {
     from_client = server_setup();

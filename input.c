@@ -1,10 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-
-#define GREEN_TEXT "\x1b[32m"
-#define COLOR_RESET "\x1b[0m"
+#include "input.h"
 
 struct cmds_array {
   char **cmds;
@@ -73,7 +67,7 @@ struct cmds_array read_input() {
   getcwd(cwd, sizeof(cwd));
 
   // getting input
-  printf(GREEN_TEXT "%s$ " COLOR_RESET, cwd);
+  printf(GREEN_BOLD "%s$ " COLOR_RESET, cwd);
   char input[256];
   fgets(input, 256, stdin); // 256 bytes
   // printf("received input: [%s]\n", input);

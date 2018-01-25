@@ -1,8 +1,5 @@
 #include "pipe_networking.h"
 
-#define GREEN_TEXT "\x1b[32m"
-#define COLOR_RESET "\x1b[0m"
-
 /*=========================
   server_setup
   args:
@@ -51,47 +48,10 @@ int server_connect(int from_client) {
     return to_client;
   }
   else {
-    printf("Handshake not completed!\n");
+    printf("PUBServer handshake not completed!\n");
     remove("luigi");
     exit(0);
   }
-}
-
-/*=========================
-  server_handshake
-  args: int * to_client
-
-  Performs the server side pipe 3 way handshake.
-  Sets *to_client to the file descriptor to the downstream pipe.
-
-  returns the file descriptor for the upstream pipe.
-  =========================*/
-int server_handshake(int *to_client) {
-
-  int from_client;
-
-  char buffer[HANDSHAKE_BUFFER_SIZE];
-
-  mkfifo("luigi", 0600);
-
-  //block on open, recieve mesage
-  printf("[server] handshake: making wkp\n");
-  from_client = open( "luigi", O_RDONLY, 0);
-  read(from_client, buffer, sizeof(buffer));
-  printf("[server] handshake: received [%s]\n", buffer);
-
-  remove("luigi");
-  printf("[server] handshake: removed wkp\n");
-
-  //connect to client, send message
-  *to_client = open(buffer, O_WRONLY, 0);
-  write(*to_client, buffer, sizeof(buffer));
-
-  //read for client
-  read(from_client, buffer, sizeof(buffer));
-  printf("[server] handshake received: %s\n", buffer);
-
-  return from_client;
 }
 
 /*=========================
@@ -112,7 +72,7 @@ int client_handshake(int *to_server) {
   // printf("[client] handshake: connecting to wkp\n");
   *to_server = open( "luigi", O_WRONLY, 0);
   if ( *to_server == -1 ) {
-    printf("Couldn't connect to PUBServer\n");
+    printf(RED_TEXT "Couldn't connect to PUBServer\n" COLOR_RESET);
     exit(1);
   }
 

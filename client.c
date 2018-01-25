@@ -17,14 +17,14 @@ void login() {
   char username[BUFFER_SIZE];
   char result[BUFFER_SIZE];
 
-  printf(GREEN_TEXT "Enter new or existing username: " COLOR_RESET);
+  printf(GREEN_BOLD "Enter new or existing username: " COLOR_RESET);
   fgets(username, sizeof(username), stdin);
   *strchr(username, '\n') = 0;
   write(to_server, username, sizeof(username));
 
   read(from_server, result, sizeof(result));
   printf(GREEN_TEXT "%s\n" COLOR_RESET, result);
-  printf("Type \"pubhelp\" for helpful commands!\n");
+  printf("Type \"pubhelp\" for helpful commands!\n\n");
 }
 
 void shell() {
