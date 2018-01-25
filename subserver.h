@@ -2,5 +2,6 @@
 #define GREEN_TEXT "\x1b[32m"
 #define COLOR_RESET "\x1b[0m"
 
-void process(char *s);
+int to_client;
 void subserver(int from_client);
+void user_folder(char *s);

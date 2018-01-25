@@ -7,6 +7,8 @@
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
+#include <signal.h>
+
 
 #ifndef NETWORKING_H
 #define NETWORKING_H

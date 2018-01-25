@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include "startup.h"
 
 void startuptext(int i) {
   printf("         +--------------+\n        /|             /|\n       / |            / |\n      *--*-----------*  |\n      |              |  |\n      | pickupbox    |  |\n      |              |  |\n   ...|  by Cesar M. |  +......\n  ....|    & Alex S. | /......\n .....|              |/......\n......*--------------*......\n");
@@ -11,18 +9,18 @@ void startuptext(int i) {
     printf("Pickupbox client loading");
   }
   fflush(stdout);
-  usleep(500000);
+  usleep(300000);
   printf(".");
   fflush(stdout);
-  usleep(500000);
+  usleep(300000);
   printf(".");
   fflush(stdout);
-  usleep(500000);
+  usleep(300000);
   printf(".");
   fflush(stdout);
-  usleep(500000);
+  usleep(300000);
   if (i) {
     printf("Ready!\n");
-    usleep(500000);
   }
+  usleep(300000);
 }

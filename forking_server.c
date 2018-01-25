@@ -1,8 +1,7 @@
-#include <signal.h>
-#include <string.h>
 #include "pipe_networking.h"
 #include "forking_server.h"
 #include "subserver.h"
+#include "startup.h"
 
 
 static void sighandler(int signo) {
@@ -23,7 +22,6 @@ int main() {
   while (1) {
     from_client = server_setup();
     parent = fork();
-    //if you are the child, send client to subserver
     if (!parent) {
       subserver(from_client);
     }
