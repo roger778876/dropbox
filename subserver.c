@@ -164,13 +164,11 @@ void server_pubdown(char *file, char *out) {
 
   if (access(fullpath, F_OK ) != -1) {
     int fd = open(fullpath, O_RDONLY);
-    int bytes = read(fd, out, sizeof(out));
+    int bytes = read(fd, out, FILE_SIZE);
     close(fd);
   }
   else {
-    strcat(out, "File \"");
-    strcat(out, file);
-    strcat(out, "\" not found!\n");
+    strcat(out, "pubdown::nofile");
   }
 }
 

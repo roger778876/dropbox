@@ -101,6 +101,7 @@ void pubup(char *localfile, char *pubname) {
 
 /* Downloads specified file from user's PUB to current directory.
    Can specify download file name through char *newfile.
+   Catches if pubfile doesn't exist, or if localfile already exists.
    Sends "pubdown::filename" to server. Receives file contents.
 */
 void pubdown(char *pubfile, char *newfile) {
@@ -109,20 +110,36 @@ void pubdown(char *pubfile, char *newfile) {
   write(to_server, input, sizeof(input));
 
   char content[FILE_SIZE];
+  memset(content, 0, strlen(content));
   read(from_server, content, sizeof(content)); // receives file contents
 
-  int fd;
-  if (strlen(newfile) == 0) { // no file name specified
-    fd = open(pubfile, O_RDWR | O_CREAT | O_EXCL, 0700);
-    write(fd, content, strlen(content));
-    close(fd);
-    printf(CYAN_BOLD "Successfully downloaded \"%s\"!\n" COLOR_RESET, pubfile);
+  if (!strncmp(content, "pubdown::nofile", (15 * sizeof(char)))) { // no file in PUB
+    printf(CYAN_BOLD "File \"%s\" couldn't be found!\n" COLOR_RESET, pubfile);
   }
-  else { // new file name specified
-    fd = open(newfile, O_RDWR | O_CREAT | O_EXCL, 0700);
-    write(fd, content, strlen(content));
-    close(fd);
-    printf(CYAN_BOLD "Successfully downloaded \"%s\" as \"%s\"!\n" COLOR_RESET, pubfile, newfile);
+  else { // pubfile exists
+    int fd;
+    if (strlen(newfile) == 0) { // no file name specified
+      if (access(pubfile, F_OK) != -1) {
+        printf(CYAN_BOLD "File \"%s\" is already in your current directory!\n" COLOR_RESET, pubfile);
+      } 
+      else {
+        fd = open(pubfile, O_RDWR | O_CREAT | O_EXCL, 0700);
+        write(fd, content, strlen(content));
+        close(fd);
+        printf(CYAN_BOLD "Successfully downloaded \"%s\"!\n" COLOR_RESET, pubfile);
+      }
+    }
+    else { // new file name specified
+      if (access(newfile, F_OK) != -1) {
+        printf(CYAN_BOLD "File \"%s\" is already in your current directory!\n" COLOR_RESET, newfile);
+      }
+      else {
+        fd = open(newfile, O_RDWR | O_CREAT | O_EXCL, 0700);
+        write(fd, content, strlen(content));
+        close(fd);
+        printf(CYAN_BOLD "Successfully downloaded \"%s\" as \"%s\"!\n" COLOR_RESET, pubfile, newfile);
+      }
+    }
   }
 }
 
