@@ -22,7 +22,8 @@ void subserver(int from_client) {
   char result[BUFFER_SIZE];
   while(read(from_client, request, sizeof(request))){
     printf(GREEN_BOLD "[PUBServer]" COLOR_RESET);
-    printf(" Received request from client \"%s\": %s\n", username, request);;
+    printf(" Received request from client \"%s\": ", username);
+    printf(YELLOW_TEXT "%s\n" COLOR_RESET, request);
 
     memset(result, 0, strlen(result));
     if (!strcmp(request, "publs")) {
@@ -39,6 +40,10 @@ void subserver(int from_client) {
       strcat(result, username);
       strcat(result, "\n");
       write(to_client, result, sizeof(result));
+    }
+    if (!strncmp(request, "pubswitch::", (11 * sizeof(char)))) {
+      char *switchuser = request + 11;
+      server_pubswitch(switchuser);
     }
     if (!strcmp(request, "pubdel")) {
       server_pubdel(result);
@@ -83,6 +88,15 @@ void server_pubdown(char *file, char *out) {
     strcat(out, file);
     strcat(out, "\" not found!\n");
   }
+}
+
+void server_pubswitch(char *newuser) {
+  memset(username, 0, strlen(username));
+  memset(filepath, 0, strlen(filepath));
+  strcat(username, newuser);
+  strcat(filepath, "users/");
+  strcat(filepath, newuser);
+  user_folder(filepath);
 }
 
 void server_pubdel(char *out) {

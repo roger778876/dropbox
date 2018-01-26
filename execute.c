@@ -34,6 +34,8 @@ void pubhelp() {
   printf(" - downloads your PUB file to your current directory\n");
   printf(CYAN_TEXT "pubuser" COLOR_RESET);
   printf(" - shows current PUB user\n");
+  printf(CYAN_TEXT "pubswitch [username]" COLOR_RESET);
+  printf(" - changes to existing or new user\n");
   printf(CYAN_TEXT "pubdel" COLOR_RESET);
   printf(" - deletes your PUB permanently\n");
 }
@@ -49,6 +51,9 @@ void publs() {
 
 void pubup(char *path) {
   printf("%s\n", path);
+
+
+
 }
 
 void pubdown(char *file) {
@@ -66,6 +71,15 @@ void pubuser() {
   write(to_server, input, sizeof(input));
   read(from_server, output, sizeof(output));
   printf(CYAN_BOLD "%s" COLOR_RESET, output);
+}
+
+void pubswitch(char *user) {
+  char input[BUFFER_SIZE] = "pubswitch::";
+  char output[BUFFER_SIZE];
+  strcat(input, user);
+  write(to_server, input, sizeof(input));
+  read(from_server, output, sizeof(output));
+  printf(CYAN_BOLD "%s\n" COLOR_RESET, output);
 }
 
 void pubdel() {
@@ -134,6 +148,14 @@ void execute(char *command, int to_s, int from_s) {
   }
   else if (!strcmp(args[0], "pubuser")) {
     pubuser();
+  }
+  else if (!strcmp(args[0], "pubswitch")) {
+    if (!args[1]) {
+      printf(CYAN_BOLD "Please specify another username.\n" COLOR_RESET);
+    }
+    else {
+      pubswitch(args[1]);
+    }
   }
   else if (!strcmp(args[0], "pubdel")) {
     pubdel();

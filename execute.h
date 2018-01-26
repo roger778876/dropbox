@@ -12,5 +12,6 @@ void publs();
 void pubup(char *path);
 void pubdown(char *file);
 void pubuser();
+void pubswitch(char *user);
 void pubdel();
 void execute(char *command, int to_s, int from_s);
