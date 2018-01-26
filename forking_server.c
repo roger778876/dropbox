@@ -14,6 +14,8 @@ static void sighandler(int signo) {
 int main() {
   signal(SIGINT, sighandler);
   startuptext(1);
+  root_folder();
+
   int from_client;
   int parent;
 
@@ -25,5 +27,17 @@ int main() {
     if (!parent) {
       subserver(from_client);
     }
+  }
+}
+
+void root_folder() {
+  if (access("users", F_OK) != -1) {
+    printf(GREEN_BOLD "[PUBServer]" COLOR_RESET);
+    printf(" Root users folder found!\n");
+  }
+  else {
+    mkdir("users", 0700);
+    printf(GREEN_BOLD "[PUBServer]" COLOR_RESET);
+    printf(" Root users folder created!\n");
   }
 }

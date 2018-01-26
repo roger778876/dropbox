@@ -29,6 +29,7 @@ void pubhelp() {
   printf("publs - shows list of files in your PUB\n");
   printf("pubup [file path] - uploads file to your PUB\n");
   printf("pubdown [file name] - downloads your PUB file to your current directory\n");
+  printf("pubdel - deletes your PUB permanently\n");
 }
 
 void publs() {

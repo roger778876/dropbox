@@ -4,3 +4,4 @@
 #define COLOR_RESET "\x1b[0m"
 
 static void sighandler(int signo);
+void root_folder();
