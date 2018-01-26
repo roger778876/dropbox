@@ -38,35 +38,42 @@ void subserver(int from_client) {
       server_publs(result);
       write(to_client, result, sizeof(result));
     }
-    if (!strncmp(request, "pubup::", (7 * sizeof(char)))) {
+    else if (!strncmp(request, "pubup::", (7 * sizeof(char)))) {
       char *fileinfo = request + 7;
       char *filename = strsep(&fileinfo, "::");
       char *filecontent = fileinfo + 1;
       server_pubup(filename, filecontent, result);
       write(to_client, result, sizeof(result));
     }
-    if (!strncmp(request, "pubdown::", (9 * sizeof(char)))) {
+    else if (!strncmp(request, "pubdown::", (9 * sizeof(char)))) {
       char *pubfile = request + 9;
 
       char download[FILE_SIZE];
       server_pubdown(pubfile, download);
       write(to_client, download, sizeof(download));
     }
-    if (!strncmp(request, "pubdel::", (8 * sizeof(char)))) {
+    else if (!strncmp(request, "pubdel::", (8 * sizeof(char)))) {
       char *pubfile = request + 8;
       server_pubdel(pubfile, result);
       write(to_client, result, sizeof(result));
     }
-    if (!strcmp(request, "pubuser")) {
+    else if (!strncmp(request, "pubrename::", (11 * sizeof(char)))) {
+      char *fileinfo = request + 11;
+      char *oldname = strsep(&fileinfo, "::");
+      char *newname = fileinfo + 1;
+      server_pubrename(oldname, newname, result);
+      write(to_client, result, sizeof(result));
+    }
+    else if (!strcmp(request, "pubuser")) {
       strcat(result, username);
       strcat(result, "\n");
       write(to_client, result, sizeof(result));
     }
-    if (!strncmp(request, "pubswitch::", (11 * sizeof(char)))) {
+    else if (!strncmp(request, "pubswitch::", (11 * sizeof(char)))) {
       char *switchuser = request + 11;
       server_pubswitch(switchuser);
     }
-    if (!strcmp(request, "pubremove")) {
+    else if (!strcmp(request, "pubremove")) {
       server_pubremove(result);
       write(to_client, result, sizeof(result));
       exit(0);
@@ -150,6 +157,31 @@ void server_pubdel(char *file, char *out) {
   else {
     strcat(out, "File \"");
     strcat(out, file);
+    strcat(out, "\" not found!\n");
+  }
+}
+
+void server_pubrename(char *oldname, char *newname, char *out) {
+  char oldpath[BUFFER_SIZE];
+  memset(oldpath, 0, strlen(oldpath));
+  strcat(oldpath, filepath);
+  strcat(oldpath, "/");
+  char newpath[BUFFER_SIZE];
+  strcpy(newpath, oldpath);
+  strcat(oldpath, oldname);
+  strcat(newpath, newname);
+
+  if (access(oldpath, F_OK ) != -1) {
+    rename(oldpath, newpath);
+    strcat(out, "File \"");
+    strcat(out, oldname);
+    strcat(out, "\" renamed to \"");
+    strcat(out, newname);
+    strcat(out, "\"!\n");
+  }
+  else {
+    strcat(out, "File \"");
+    strcat(out, oldname);
     strcat(out, "\" not found!\n");
   }
 }

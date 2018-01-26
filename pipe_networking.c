@@ -95,7 +95,7 @@ int client_handshake(int *to_server) {
   //send ACK to server
   write(*to_server, ACK, sizeof(buffer));
 
-  printf("Ready!\n");
+  printf("Connected to PUBServer!\n");
 
   return from_server;
 }

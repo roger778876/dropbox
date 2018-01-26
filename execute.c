@@ -20,12 +20,14 @@ void pubhelp() {
   printf(CYAN_BOLD "Pickupbox commands:\n" COLOR_RESET);
   printf(CYAN_TEXT "publs" COLOR_RESET);
   printf(" - shows list of files in your PUB\n");
-  printf(CYAN_TEXT "pubup [local file] [optional PUB name]" COLOR_RESET);
+  printf(CYAN_TEXT "pubup [local file] ([PUB name])" COLOR_RESET);
   printf(" - uploads local file to your PUB\n");
-  printf(CYAN_TEXT "pubdown [PUB file] [optional name]" COLOR_RESET);
+  printf(CYAN_TEXT "pubdown [PUB file] ([local name])" COLOR_RESET);
   printf(" - downloads PUB file to your current directory\n");
   printf(CYAN_TEXT "pubdel [PUB file]" COLOR_RESET);
   printf(" - deletes PUB file from your PUB\n");
+  printf(CYAN_TEXT "pubrename [PUB file] [new name]" COLOR_RESET);
+  printf(" - renames PUB file\n");
   printf(CYAN_TEXT "pubuser" COLOR_RESET);
   printf(" - shows current PUB user\n");
   printf(CYAN_TEXT "pubswitch [username]" COLOR_RESET);
@@ -103,6 +105,17 @@ void pubdel(char *file) {
   char input[BUFFER_SIZE] = "pubdel::";
   char output[BUFFER_SIZE];
   strcat(input, file);
+  write(to_server, input, sizeof(input));
+  read(from_server, output, sizeof(output));
+  printf(CYAN_BOLD "%s" COLOR_RESET, output);
+}
+
+void pubrename(char *oldname, char *newname) {
+  char input[BUFFER_SIZE] = "pubrename::";
+  char output[BUFFER_SIZE];
+  strcat(input, oldname);
+  strcat(input, "::");
+  strcat(input, newname);
   write(to_server, input, sizeof(input));
   read(from_server, output, sizeof(output));
   printf(CYAN_BOLD "%s" COLOR_RESET, output);
@@ -205,6 +218,14 @@ void execute(char *command, int to_s, int from_s) {
     }
     else {
       pubdel(args[1]);
+    }
+  }
+  else if (!strcmp(args[0], "pubrename")) {
+    if (!args[1] || !args[2]) {
+      printf(CYAN_BOLD "Please specify a PUB file and a new name.\n" COLOR_RESET);
+    }
+    else {
+      pubrename(args[1], args[2]);
     }
   }
   else if (!strcmp(args[0], "pubuser")) {
