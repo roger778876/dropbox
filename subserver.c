@@ -50,6 +50,14 @@ void subserver(int from_client) {
       server_pubdown(pubfile, result);
       write(to_client, result, sizeof(result));
     }
+    if (!strncmp(request, "pubdel::", (8 * sizeof(char)))) {
+      char *pubfile = request + 8;
+      server_pubdel(pubfile, result);
+      write(to_client, result, sizeof(result));
+
+
+
+    }
     if (!strcmp(request, "pubuser")) {
       strcat(result, username);
       strcat(result, "\n");
@@ -118,6 +126,27 @@ void server_pubdown(char *file, char *out) {
     printf("file exists!\n");
 
 
+  }
+  else {
+    strcat(out, "File \"");
+    strcat(out, file);
+    strcat(out, "\" not found!\n");
+  }
+}
+
+void server_pubdel(char *file, char *out) {
+  char fullpath[BUFFER_SIZE];
+  memset(fullpath, 0, strlen(fullpath));
+  strcat(fullpath, filepath);
+  strcat(fullpath, "/");
+  strcat(fullpath, file);
+  // printf("%s\n", fullpath);
+
+  if (access(fullpath, F_OK ) != -1) {
+    remove(fullpath);
+    strcat(out, "File \"");
+    strcat(out, file);
+    strcat(out, "\" deleted!\n");
   }
   else {
     strcat(out, "File \"");
