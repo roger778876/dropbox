@@ -41,7 +41,13 @@ void publs() {
   printf("%s", output);
 }
 
+void pubup(char *path) {
+  printf("%s\n", path);
+}
 
+void pubdown(char *file) {
+
+}
 
 void pubdel() {
   printf(RED_BOLD "You are permanently deleting all your PUB files. Are you sure? (Yes/No) " COLOR_RESET);
@@ -59,6 +65,7 @@ void pubdel() {
       read(from_server, output, sizeof(output));
       printf(CYAN_BOLD "%s" COLOR_RESET, output);
       printf("Exiting Pickupbox client...\n");
+      exit(0);
     }
     else {
       printf(CYAN_BOLD "Cancelled\n" COLOR_RESET);
@@ -83,6 +90,7 @@ void execute(char *command, int to_s, int from_s) {
   else if (!strcmp(args[0], "exit")) {
     exit_program();
   }
+
   else if (!strcmp(args[0], "pubhelp")) {
     pubhelp();
   }
@@ -90,14 +98,25 @@ void execute(char *command, int to_s, int from_s) {
     publs();
   }
   else if (!strcmp(args[0], "pubup")) {
-
+    if (!args[1]) {
+      printf(CYAN_BOLD "Please specify a file.\n" COLOR_RESET);
+    }
+    else {
+      pubup(args[1]);
+    }
   }
   else if (!strcmp(args[0], "pubdown")) {
-
+    if (!args[1]) {
+      printf(CYAN_BOLD "Please specify a file.\n" COLOR_RESET);
+    }
+    else {
+      pubdown(args[1]);
+    }
   }
   else if (!strcmp(args[0], "pubdel")) {
     pubdel();
   }
+
   else {
     int piping = 0;
     for (int i = 0; args[i]; i++) {

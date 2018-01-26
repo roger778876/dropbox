@@ -13,10 +13,10 @@
   =========================*/
 int server_setup() {
   int from_client;
-  mkfifo("luigi", 0600);
-  from_client = open("luigi", O_RDONLY, 0);
+  mkfifo("pubwkp", 0600);
+  from_client = open("pubwkp", O_RDONLY, 0);
 
-  remove("luigi");
+  remove("pubwkp");
 
   return from_client;
 }
@@ -49,7 +49,7 @@ int server_connect(int from_client) {
   }
   else {
     printf("PUBServer handshake not completed!\n");
-    remove("luigi");
+    remove("pubwkp");
     exit(0);
   }
 }
@@ -70,7 +70,7 @@ int client_handshake(int *to_server) {
 
   //send pp name to server
   // printf("[client] handshake: connecting to wkp\n");
-  *to_server = open( "luigi", O_WRONLY, 0);
+  *to_server = open( "pubwkp", O_WRONLY, 0);
   if ( *to_server == -1 ) {
     printf(RED_TEXT "Couldn't connect to PUBServer\n" COLOR_RESET);
     exit(1);

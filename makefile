@@ -32,6 +32,7 @@ clean:
 	rm -rf *~
 	rm -rf client
 	rm -rf server
+	rm -rf pubwkp
 
 bleach:
 	rm -rf users

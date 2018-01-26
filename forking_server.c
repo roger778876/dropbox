@@ -6,7 +6,7 @@
 
 static void sighandler(int signo) {
   if (signo == SIGINT) {
-    remove("luigi");
+    remove("pubwkp");
     exit(0);
   }
 }
@@ -26,6 +26,9 @@ int main() {
     parent = fork();
     if (!parent) {
       subserver(from_client);
+    }
+    else {
+      close(from_client);
     }
   }
 }
