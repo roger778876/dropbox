@@ -1,7 +1,5 @@
-# Pickupbox
+# Pickupbox by Cesar Mu & Alex Shevchenko pd. 5
 **Systems Level Programming - Final Project**
-
-by Cesar Mu & Alex Shevchenko pd. 5
 
 ## Description ##
 Pickupbox (PUB) behaves just like Dropbox; the user can upload, store, and download files between their local directory and their PUB server directory. The PUB Client is a command shell where the user can browse through their local folders. Once the user wants to interact with their PUB directory, they can simply run a special "pub" command.
