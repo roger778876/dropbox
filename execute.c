@@ -1,12 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
 #include <sys/wait.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <signal.h>
 #include "input.h"
 #include "execute.h"
 #include "pipe_networking.h"
@@ -29,14 +21,14 @@ void pubhelp() {
   printf(CYAN_TEXT "publs" COLOR_RESET);
   printf(" - shows list of files in your PUB\n");
   printf(CYAN_TEXT "pubup [local file] [PUB name]" COLOR_RESET);
-  printf(" - uploads file to your PUB\n");
+  printf(" - uploads local file to your PUB\n");
   printf(CYAN_TEXT "pubdown [PUB file]" COLOR_RESET);
   printf(" - downloads PUB file to your current directory\n");
   printf(CYAN_TEXT "pubuser" COLOR_RESET);
   printf(" - shows current PUB user\n");
   printf(CYAN_TEXT "pubswitch [username]" COLOR_RESET);
   printf(" - changes to existing or new user\n");
-  printf(CYAN_TEXT "pubdel" COLOR_RESET);
+  printf(CYAN_TEXT "pubremove" COLOR_RESET);
   printf(" - deletes your PUB permanently\n");
 }
 
@@ -52,8 +44,15 @@ void publs() {
 void pubup(char *localfile, char *pubname) {
   // printf("%s\n", path);
   int fd = open(localfile, O_RDONLY);
+  struct stat s;
+  fstat(fd, &s);
+  int filesize = s.st_size;
+
   if (fd == -1) {
     printf(CYAN_BOLD "Couldn't find local file!\n" COLOR_RESET);
+  }
+  else if (filesize > FILE_SIZE) {
+    printf(CYAN_BOLD "File is too large!\n" COLOR_RESET);
   }
   else {
     char content[FILE_SIZE];
@@ -69,12 +68,6 @@ void pubup(char *localfile, char *pubname) {
     write(to_server, input, sizeof(input));
     read(from_server, output, sizeof(output));
     printf(CYAN_BOLD "%s" COLOR_RESET, output);
-
-
-
-
-
-
   }
 }
 
@@ -104,19 +97,19 @@ void pubswitch(char *user) {
   printf(CYAN_BOLD "%s\n" COLOR_RESET, output);
 }
 
-void pubdel() {
+void pubremove() {
   printf(RED_BOLD "You are permanently deleting all your PUB files. Are you sure? (Yes/No) " COLOR_RESET);
   char answer[100];
   fgets(answer, sizeof(answer), stdin);
   *strchr(answer, '\n') = 0;
   if (!strcmp(answer, "Yes")) {
-    printf(RED_BOLD "Confirm delete? (YES/NO) " COLOR_RESET);
+    printf(RED_BOLD "Confirm delete? (DELETE/NO) " COLOR_RESET);
     fgets(answer, sizeof(answer), stdin);
     *strchr(answer, '\n') = 0;
 
-    if (!strcmp(answer, "YES")) {
+    if (!strcmp(answer, "DELETE")) {
       char output[BUFFER_SIZE];
-      write(to_server, "pubdel", sizeof("pubdel"));
+      write(to_server, "pubremove", sizeof("pubremove"));
       read(from_server, output, sizeof(output));
       printf(CYAN_BOLD "%s" COLOR_RESET, output);
       printf("Exiting Pickupbox client...\n");
@@ -179,8 +172,8 @@ void execute(char *command, int to_s, int from_s) {
       pubswitch(args[1]);
     }
   }
-  else if (!strcmp(args[0], "pubdel")) {
-    pubdel();
+  else if (!strcmp(args[0], "pubremove")) {
+    pubremove();
   }
 
   else {

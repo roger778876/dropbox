@@ -41,16 +41,9 @@ void subserver(int from_client) {
     if (!strncmp(request, "pubup::", (7 * sizeof(char)))) {
       char *fileinfo = request + 7;
       char *filename = strsep(&fileinfo, "::");
-      char *filecontent = fileinfo;
+      char *filecontent = fileinfo + 1;
       server_pubup(filename, filecontent, result);
       write(to_client, result, sizeof(result));
-
-
-
-
-
-
-
     }
     if (!strncmp(request, "pubdown::", (9 * sizeof(char)))) {
       char *pubfile = request + 9;
@@ -66,8 +59,8 @@ void subserver(int from_client) {
       char *switchuser = request + 11;
       server_pubswitch(switchuser);
     }
-    if (!strcmp(request, "pubdel")) {
-      server_pubdel(result);
+    if (!strcmp(request, "pubremove")) {
+      server_pubremove(result);
       write(to_client, result, sizeof(result));
       exit(0);
     }
@@ -98,19 +91,19 @@ void server_pubup(char *filename, char *content, char *out) {
   strcat(fullpath, "/");
   strcat(fullpath, filename);
 
-  if(access(fullpath, F_OK ) != -1) {
+  if (access(fullpath, F_OK ) != -1) {
     strcat(out, "\"");
     strcat(out, filename);
     strcat(out, "\" already exists in your PUB!\n");
   }
   else {
-    
+    int fd = open(fullpath, O_RDWR | O_CREAT | O_EXCL, 0700);
+    write(fd, content, strlen(content));
+    close(fd);
+    strcat(out, "Successfully uploaded \"");
+    strcat(out, filename);
+    strcat(out, "\" to your PUB!\n");
   }
-
-
-
-
-
 }
 
 void server_pubdown(char *file, char *out) {
@@ -121,7 +114,7 @@ void server_pubdown(char *file, char *out) {
   strcat(fullpath, file);
   // printf("%s\n", fullpath);
 
-  if(access(fullpath, F_OK ) != -1) {
+  if (access(fullpath, F_OK ) != -1) {
     printf("file exists!\n");
 
 
@@ -142,7 +135,7 @@ void server_pubswitch(char *newuser) {
   user_folder(filepath);
 }
 
-void server_pubdel(char *out) {
+void server_pubremove(char *out) {
   DIR *d = opendir(filepath);
   struct dirent *next_file;
   char path[BUFFER_SIZE];
