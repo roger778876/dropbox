@@ -1,0 +1,29 @@
+Pickupbox Devlog
+Cesar Mu & Alex Shevchenko pd. 5
+Systems Level Programming - Final Project
+=========================================
+
+12/22/17
+- Start on design doc
+
+12/26/17
+- Commit final design
+
+1/9/18
+- Work on PUB logo for server/client loading screen
+
+1/10/18
+- Add loading animation
+
+1/14/18
+- Start on server and networking
+
+1/25/18
+- Finish forking server and pipe networking
+- Work on client
+- Add PUB command functionality
+
+1/26/18
+- Finalize README
+- Make code more readable and add comments
+- Completed!
