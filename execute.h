@@ -1,3 +1,4 @@
+#define CYAN_TEXT  "\x1B[36m"
 #define CYAN_BOLD  "\x1B[36;1m"
 #define RED_BOLD "\x1B[31;1m"
 #define COLOR_RESET "\x1b[0m"

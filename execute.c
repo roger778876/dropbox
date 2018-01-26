@@ -26,10 +26,14 @@ void exit_program() {
 
 void pubhelp() {
   printf(CYAN_BOLD "Pickupbox commands:\n" COLOR_RESET);
-  printf("publs - shows list of files in your PUB\n");
-  printf("pubup [file path] - uploads file to your PUB\n");
-  printf("pubdown [file name] - downloads your PUB file to your current directory\n");
-  printf("pubdel - deletes your PUB permanently\n");
+  printf(CYAN_TEXT "publs" COLOR_RESET);
+  printf(" - shows list of files in your PUB\n");
+  printf(CYAN_TEXT "pubup [file path]" COLOR_RESET);
+  printf(" - uploads file to your PUB\n");
+  printf(CYAN_TEXT "pubdown [file name]" COLOR_RESET);
+  printf(" - downloads your PUB file to your current directory\n");
+  printf(CYAN_TEXT "pubdel" COLOR_RESET);
+  printf(" - deletes your PUB permanently\n");
 }
 
 void publs() {
@@ -46,7 +50,12 @@ void pubup(char *path) {
 }
 
 void pubdown(char *file) {
-
+  char input[BUFFER_SIZE] = "pubdown::";
+  char output[BUFFER_SIZE];
+  strcat(input, file);
+  write(to_server, input, sizeof(input));
+  read(from_server, output, sizeof(output));
+  printf(CYAN_BOLD "%s" COLOR_RESET, output);
 }
 
 void pubdel() {

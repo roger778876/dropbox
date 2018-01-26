@@ -21,6 +21,9 @@ void subserver(int from_client) {
   char request[BUFFER_SIZE];
   char result[BUFFER_SIZE];
   while(read(from_client, request, sizeof(request))){
+    printf(GREEN_BOLD "[PUBServer]" COLOR_RESET);
+    printf(" Received request from client \"%s\": %s\n", username, request);;
+
     memset(result, 0, strlen(result));
     if (!strcmp(request, "publs")) {
       server_publs(result);
@@ -30,6 +33,13 @@ void subserver(int from_client) {
       server_pubdel(result);
       write(to_client, result, sizeof(result));
       exit(0);
+    }
+
+
+    if (!strncmp(request, "pubdown::", (9 * sizeof(char)))) {
+      char *pubfile = request + 9;
+      server_pubdown(pubfile, result);
+      write(to_client, result, sizeof(result));
     }
   }
 
@@ -48,6 +58,26 @@ void server_publs(char *out) {
       }
     }
     closedir(d);
+  }
+}
+
+void server_pubdown(char *file, char *out) {
+  char fullpath[BUFFER_SIZE];
+  memset(fullpath, 0, strlen(fullpath));
+  strcat(fullpath, filepath);
+  strcat(fullpath, "/");
+  strcat(fullpath, file);
+  printf("%s\n", fullpath);
+
+  if(access(fullpath, F_OK ) != -1) {
+    printf("file exists!\n");
+
+    
+  }
+  else {
+    strcat(out, "File \"");
+    strcat(out, file);
+    strcat(out, "\" not found!\n");
   }
 }
 
