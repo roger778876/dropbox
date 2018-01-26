@@ -2,6 +2,7 @@
 #include "client.h"
 #include "execute.h"
 #include "input.c"
+#include "startup.h"
 
 int to_server;
 int from_server;

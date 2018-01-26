@@ -29,17 +29,21 @@ void subserver(int from_client) {
       server_publs(result);
       write(to_client, result, sizeof(result));
     }
-    if (!strcmp(request, "pubdel")) {
-      server_pubdel(result);
-      write(to_client, result, sizeof(result));
-      exit(0);
-    }
-
 
     if (!strncmp(request, "pubdown::", (9 * sizeof(char)))) {
       char *pubfile = request + 9;
       server_pubdown(pubfile, result);
       write(to_client, result, sizeof(result));
+    }
+    if (!strcmp(request, "pubuser")) {
+      strcat(result, username);
+      strcat(result, "\n");
+      write(to_client, result, sizeof(result));
+    }
+    if (!strcmp(request, "pubdel")) {
+      server_pubdel(result);
+      write(to_client, result, sizeof(result));
+      exit(0);
     }
   }
 
@@ -72,7 +76,7 @@ void server_pubdown(char *file, char *out) {
   if(access(fullpath, F_OK ) != -1) {
     printf("file exists!\n");
 
-    
+
   }
   else {
     strcat(out, "File \"");

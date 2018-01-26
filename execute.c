@@ -28,10 +28,12 @@ void pubhelp() {
   printf(CYAN_BOLD "Pickupbox commands:\n" COLOR_RESET);
   printf(CYAN_TEXT "publs" COLOR_RESET);
   printf(" - shows list of files in your PUB\n");
-  printf(CYAN_TEXT "pubup [file path]" COLOR_RESET);
+  printf(CYAN_TEXT "pubup [local file]" COLOR_RESET);
   printf(" - uploads file to your PUB\n");
-  printf(CYAN_TEXT "pubdown [file name]" COLOR_RESET);
+  printf(CYAN_TEXT "pubdown [PUB file]" COLOR_RESET);
   printf(" - downloads your PUB file to your current directory\n");
+  printf(CYAN_TEXT "pubuser" COLOR_RESET);
+  printf(" - shows current PUB user\n");
   printf(CYAN_TEXT "pubdel" COLOR_RESET);
   printf(" - deletes your PUB permanently\n");
 }
@@ -53,6 +55,14 @@ void pubdown(char *file) {
   char input[BUFFER_SIZE] = "pubdown::";
   char output[BUFFER_SIZE];
   strcat(input, file);
+  write(to_server, input, sizeof(input));
+  read(from_server, output, sizeof(output));
+  printf(CYAN_BOLD "%s" COLOR_RESET, output);
+}
+
+void pubuser() {
+  char input[BUFFER_SIZE] = "pubuser";
+  char output[BUFFER_SIZE];
   write(to_server, input, sizeof(input));
   read(from_server, output, sizeof(output));
   printf(CYAN_BOLD "%s" COLOR_RESET, output);
@@ -121,6 +131,9 @@ void execute(char *command, int to_s, int from_s) {
     else {
       pubdown(args[1]);
     }
+  }
+  else if (!strcmp(args[0], "pubuser")) {
+    pubuser();
   }
   else if (!strcmp(args[0], "pubdel")) {
     pubdel();
