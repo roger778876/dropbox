@@ -10,7 +10,7 @@ char filepath[BUFFER_SIZE];
 void subserver(int from_client);
 void user_folder(char *s);
 void server_publs(char *out);
-
+void server_pubup(char *filename, char *content, char *out);
 void server_pubdown(char *file, char *out);
 void server_pubswitch(char *newuser);
 void server_pubdel(char *out);

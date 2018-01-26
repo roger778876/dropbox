@@ -9,7 +9,7 @@ void change_dir(char **command);
 void exit_program();
 void pubhelp();
 void publs();
-void pubup(char *path);
+void pubup(char *localfile, char *pubname);
 void pubdown(char *file);
 void pubuser();
 void pubswitch(char *user);

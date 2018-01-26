@@ -20,6 +20,8 @@
 #define ACK "HOLA"
 #define HANDSHAKE_BUFFER_SIZE 10
 #define BUFFER_SIZE 1000
+#define FILE_SIZE 100000
+#define PREVIEW_SIZE 30
 
 int server_handshake(int *to_client);
 int client_handshake(int *to_server);

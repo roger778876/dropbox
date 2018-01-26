@@ -18,19 +18,40 @@ void subserver(int from_client) {
   strcat(filepath, username);
   user_folder(filepath);
 
-  char request[BUFFER_SIZE];
+  char request[FILE_SIZE + 10];
   char result[BUFFER_SIZE];
+  char preview[PREVIEW_SIZE];
   while(read(from_client, request, sizeof(request))){
     printf(GREEN_BOLD "[PUBServer]" COLOR_RESET);
     printf(" Received request from client \"%s\": ", username);
-    printf(YELLOW_TEXT "%s\n" COLOR_RESET, request);
+    memset(preview, 0, strlen(preview));
+    strncat(preview, request, (PREVIEW_SIZE * sizeof(char)));
+    for (int i = PREVIEW_SIZE - 3; i < PREVIEW_SIZE; i++) {
+      if (preview[i]) {
+        preview[i] = '.';
+      }
+    }
+    printf(YELLOW_TEXT "%s\n" COLOR_RESET, preview);
 
     memset(result, 0, strlen(result));
     if (!strcmp(request, "publs")) {
       server_publs(result);
       write(to_client, result, sizeof(result));
     }
+    if (!strncmp(request, "pubup::", (7 * sizeof(char)))) {
+      char *fileinfo = request + 7;
+      char *filename = strsep(&fileinfo, "::");
+      char *filecontent = fileinfo;
+      server_pubup(filename, filecontent, result);
+      write(to_client, result, sizeof(result));
 
+
+
+
+
+
+
+    }
     if (!strncmp(request, "pubdown::", (9 * sizeof(char)))) {
       char *pubfile = request + 9;
       server_pubdown(pubfile, result);
@@ -70,13 +91,35 @@ void server_publs(char *out) {
   }
 }
 
+void server_pubup(char *filename, char *content, char *out) {
+  char fullpath[BUFFER_SIZE];
+  memset(fullpath, 0, strlen(fullpath));
+  strcat(fullpath, filepath);
+  strcat(fullpath, "/");
+  strcat(fullpath, filename);
+
+  if(access(fullpath, F_OK ) != -1) {
+    strcat(out, "\"");
+    strcat(out, filename);
+    strcat(out, "\" already exists in your PUB!\n");
+  }
+  else {
+    
+  }
+
+
+
+
+
+}
+
 void server_pubdown(char *file, char *out) {
   char fullpath[BUFFER_SIZE];
   memset(fullpath, 0, strlen(fullpath));
   strcat(fullpath, filepath);
   strcat(fullpath, "/");
   strcat(fullpath, file);
-  printf("%s\n", fullpath);
+  // printf("%s\n", fullpath);
 
   if(access(fullpath, F_OK ) != -1) {
     printf("file exists!\n");

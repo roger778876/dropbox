@@ -28,10 +28,10 @@ void pubhelp() {
   printf(CYAN_BOLD "Pickupbox commands:\n" COLOR_RESET);
   printf(CYAN_TEXT "publs" COLOR_RESET);
   printf(" - shows list of files in your PUB\n");
-  printf(CYAN_TEXT "pubup [local file]" COLOR_RESET);
+  printf(CYAN_TEXT "pubup [local file] [PUB name]" COLOR_RESET);
   printf(" - uploads file to your PUB\n");
   printf(CYAN_TEXT "pubdown [PUB file]" COLOR_RESET);
-  printf(" - downloads your PUB file to your current directory\n");
+  printf(" - downloads PUB file to your current directory\n");
   printf(CYAN_TEXT "pubuser" COLOR_RESET);
   printf(" - shows current PUB user\n");
   printf(CYAN_TEXT "pubswitch [username]" COLOR_RESET);
@@ -49,11 +49,33 @@ void publs() {
   printf("%s", output);
 }
 
-void pubup(char *path) {
-  printf("%s\n", path);
+void pubup(char *localfile, char *pubname) {
+  // printf("%s\n", path);
+  int fd = open(localfile, O_RDONLY);
+  if (fd == -1) {
+    printf(CYAN_BOLD "Couldn't find local file!\n" COLOR_RESET);
+  }
+  else {
+    char content[FILE_SIZE];
+    int bytes = read(fd, content, sizeof(content));
+    // printf("%s\n", content);
+    close(fd);
+
+    char input[FILE_SIZE + 9] = "pubup::";
+    char output[BUFFER_SIZE];
+    strcat(input, pubname);
+    strcat(input, "::");
+    strcat(input, content);
+    write(to_server, input, sizeof(input));
+    read(from_server, output, sizeof(output));
+    printf(CYAN_BOLD "%s" COLOR_RESET, output);
 
 
 
+
+
+
+  }
 }
 
 void pubdown(char *file) {
@@ -131,11 +153,11 @@ void execute(char *command, int to_s, int from_s) {
     publs();
   }
   else if (!strcmp(args[0], "pubup")) {
-    if (!args[1]) {
-      printf(CYAN_BOLD "Please specify a file.\n" COLOR_RESET);
+    if (!args[1] || !args[2]) {
+      printf(CYAN_BOLD "Please specify a local file and PUB file name.\n" COLOR_RESET);
     }
     else {
-      pubup(args[1]);
+      pubup(args[1], args[2]);
     }
   }
   else if (!strcmp(args[0], "pubdown")) {
