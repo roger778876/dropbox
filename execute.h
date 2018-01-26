@@ -10,7 +10,7 @@ void exit_program();
 void pubhelp();
 void publs();
 void pubup(char *localfile, char *pubname);
-void pubdown(char *file);
+void pubdown(char *pubfile, char *newfile);
 void pubdel(char *pubfile);
 void pubuser();
 void pubswitch(char *user);

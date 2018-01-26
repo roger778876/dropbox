@@ -47,16 +47,15 @@ void subserver(int from_client) {
     }
     if (!strncmp(request, "pubdown::", (9 * sizeof(char)))) {
       char *pubfile = request + 9;
-      server_pubdown(pubfile, result);
-      write(to_client, result, sizeof(result));
+
+      char download[FILE_SIZE];
+      server_pubdown(pubfile, download);
+      write(to_client, download, sizeof(download));
     }
     if (!strncmp(request, "pubdel::", (8 * sizeof(char)))) {
       char *pubfile = request + 8;
       server_pubdel(pubfile, result);
       write(to_client, result, sizeof(result));
-
-
-
     }
     if (!strcmp(request, "pubuser")) {
       strcat(result, username);
@@ -123,9 +122,9 @@ void server_pubdown(char *file, char *out) {
   // printf("%s\n", fullpath);
 
   if (access(fullpath, F_OK ) != -1) {
-    printf("file exists!\n");
-
-
+    int fd = open(fullpath, O_RDONLY);
+    int bytes = read(fd, out, sizeof(out));
+    close(fd);
   }
   else {
     strcat(out, "File \"");

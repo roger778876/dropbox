@@ -20,9 +20,9 @@ void pubhelp() {
   printf(CYAN_BOLD "Pickupbox commands:\n" COLOR_RESET);
   printf(CYAN_TEXT "publs" COLOR_RESET);
   printf(" - shows list of files in your PUB\n");
-  printf(CYAN_TEXT "pubup [local file] [PUB name]" COLOR_RESET);
+  printf(CYAN_TEXT "pubup [local file] [optional PUB name]" COLOR_RESET);
   printf(" - uploads local file to your PUB\n");
-  printf(CYAN_TEXT "pubdown [PUB file]" COLOR_RESET);
+  printf(CYAN_TEXT "pubdown [PUB file] [optional name]" COLOR_RESET);
   printf(" - downloads PUB file to your current directory\n");
   printf(CYAN_TEXT "pubdel [PUB file]" COLOR_RESET);
   printf(" - deletes PUB file from your PUB\n");
@@ -64,7 +64,13 @@ void pubup(char *localfile, char *pubname) {
 
     char input[FILE_SIZE + 9] = "pubup::";
     char output[BUFFER_SIZE];
-    strcat(input, pubname);
+
+    if (strlen(pubname) == 0) {
+      strcat(input, localfile);
+    }
+    else {
+      strcat(input, pubname);
+    }
     strcat(input, "::");
     strcat(input, content);
     write(to_server, input, sizeof(input));
@@ -73,13 +79,24 @@ void pubup(char *localfile, char *pubname) {
   }
 }
 
-void pubdown(char *file) {
+void pubdown(char *pubfile, char *newfile) {
   char input[BUFFER_SIZE] = "pubdown::";
-  char output[BUFFER_SIZE];
-  strcat(input, file);
+  char content[FILE_SIZE];
+  strcat(input, pubfile);
   write(to_server, input, sizeof(input));
-  read(from_server, output, sizeof(output));
-  printf(CYAN_BOLD "%s" COLOR_RESET, output);
+  read(from_server, content, sizeof(content));
+
+  int fd;
+  if (strlen(newfile) == 0) {
+    fd = open(pubfile, O_RDWR | O_CREAT | O_EXCL, 0700);
+    printf(CYAN_BOLD "Successfully downloaded \"%s\"!\n" COLOR_RESET, pubfile);
+  }
+  else {
+    fd = open(newfile, O_RDWR | O_CREAT | O_EXCL, 0700);
+    printf(CYAN_BOLD "Successfully downloaded \"%s\" as \"%s\"!\n" COLOR_RESET, pubfile, newfile);
+  }
+  write(fd, content, strlen(content));
+  close(fd);
 }
 
 void pubdel(char *file) {
@@ -157,19 +174,29 @@ void execute(char *command, int to_s, int from_s) {
     publs();
   }
   else if (!strcmp(args[0], "pubup")) {
-    if (!args[1] || !args[2]) {
-      printf(CYAN_BOLD "Please specify a local file and PUB file name.\n" COLOR_RESET);
+    if (!args[1]) {
+      printf(CYAN_BOLD "Please specify a local file to upload.\n" COLOR_RESET);
     }
     else {
-      pubup(args[1], args[2]);
+      if (!args[2]) {
+        pubup(args[1], "");
+      }
+      else {
+        pubup(args[1], args[2]);
+      }
     }
   }
   else if (!strcmp(args[0], "pubdown")) {
     if (!args[1]) {
-      printf(CYAN_BOLD "Please specify a file.\n" COLOR_RESET);
+      printf(CYAN_BOLD "Please specify a PUB file to download.\n" COLOR_RESET);
     }
     else {
-      pubdown(args[1]);
+      if (!args[2]) {
+        pubdown(args[1], "");
+      }
+      else {
+        pubdown(args[1], args[2]);
+      }
     }
   }
   else if (!strcmp(args[0], "pubdel")) {
