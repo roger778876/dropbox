@@ -5,6 +5,8 @@
 
 int to_client;
 char username[BUFFER_SIZE];
+char filepath[BUFFER_SIZE];
 void subserver(int from_client);
 void user_folder(char *s);
 void server_publs(char *out);
+void server_pubdel(char *out);

@@ -24,8 +24,13 @@ void subserver(int from_client) {
     memset(result, 0, strlen(result));
     if (!strcmp(request, "publs")) {
       server_publs(result);
+      write(to_client, result, sizeof(result));
     }
-    write(to_client, result, sizeof(result));
+    if (!strcmp(request, "pubdel")) {
+      server_pubdel(result);
+      write(to_client, result, sizeof(result));
+      exit(0);
+    }
   }
 
   exit(0);
@@ -44,6 +49,24 @@ void server_publs(char *out) {
     }
     closedir(d);
   }
+}
+
+void server_pubdel(char *out) {
+  DIR *d = opendir(filepath);
+  struct dirent *next_file;
+  char path[BUFFER_SIZE];
+
+  while ((next_file = readdir(d)) != NULL )
+  {
+      sprintf(path, "%s/%s", filepath, next_file->d_name);
+      remove(path);
+  }
+  closedir(d);
+  rmdir(filepath);
+
+  strcat(out, "Successfully removed ");
+  strcat(out, username);
+  strcat(out, "'s PUB.\n");
 }
 
 void user_folder(char * userpath) { // creates new folder if necessary

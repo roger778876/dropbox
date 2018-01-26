@@ -41,6 +41,34 @@ void publs() {
   printf("%s", output);
 }
 
+
+
+void pubdel() {
+  printf(RED_BOLD "You are permanently deleting all your PUB files. Are you sure? (Yes/No) " COLOR_RESET);
+  char answer[100];
+  fgets(answer, sizeof(answer), stdin);
+  *strchr(answer, '\n') = 0;
+  if (!strcmp(answer, "Yes")) {
+    printf(RED_BOLD "Confirm delete? (YES/NO) " COLOR_RESET);
+    fgets(answer, sizeof(answer), stdin);
+    *strchr(answer, '\n') = 0;
+
+    if (!strcmp(answer, "YES")) {
+      char output[BUFFER_SIZE];
+      write(to_server, "pubdel", sizeof("pubdel"));
+      read(from_server, output, sizeof(output));
+      printf(CYAN_BOLD "%s" COLOR_RESET, output);
+      printf("Exiting Pickupbox client...\n");
+    }
+    else {
+      printf(CYAN_BOLD "Cancelled\n" COLOR_RESET);
+    }
+  }
+  else {
+    printf(CYAN_BOLD "Cancelled\n" COLOR_RESET);
+  }
+}
+
 void execute(char *command, int to_s, int from_s) {
   char **args = separate_args(command);
   to_server = to_s;
@@ -63,6 +91,12 @@ void execute(char *command, int to_s, int from_s) {
   }
   else if (!strcmp(args[0], "pubup")) {
 
+  }
+  else if (!strcmp(args[0], "pubdown")) {
+
+  }
+  else if (!strcmp(args[0], "pubdel")) {
+    pubdel();
   }
   else {
     int piping = 0;

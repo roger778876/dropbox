@@ -32,3 +32,10 @@ clean:
 	rm -rf *~
 	rm -rf client
 	rm -rf server
+
+bleach:
+	rm -rf users
+	rm -rf *.o
+	rm -rf *~
+	rm -rf client
+	rm -rf server
