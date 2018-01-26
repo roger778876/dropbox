@@ -1,11 +1,13 @@
-#include <sys/wait.h>
 #include "input.h"
 #include "execute.h"
 #include "pipe_networking.h"
 
+
 int to_server;
 int from_server;
 
+/* ORIGINAL SHELL SPECIAL COMMANDS
+*/
 void change_dir(char **command) {
   if (chdir(command[1])) {
     printf("%s\n", strerror(errno));
@@ -16,6 +18,13 @@ void exit_program() {
   kill(getpid(), SIGKILL);
 }
 
+
+/* PICKUPBOX SPECIAL COMMANDS
+   pubhelp, publs, pubup, pubdown, pubdel, pubrename, pubinfo, pubuser, pubswitch, pubremove
+*/
+
+/* PUB manual
+*/
 void pubhelp() {
   printf(CYAN_BOLD "Pickupbox commands:\n" COLOR_RESET);
   printf(CYAN_TEXT "publs" COLOR_RESET);
@@ -38,97 +47,125 @@ void pubhelp() {
   printf(" - deletes your PUB permanently\n");
 }
 
+/* Lists all files in the user's PUB.
+   Sends "publs" to subserver. Receives list of files string.
+*/
 void publs() {
   char input[BUFFER_SIZE] = "publs";
-  char output[BUFFER_SIZE];
   write(to_server, input, sizeof(input));
+
+  char output[BUFFER_SIZE];
   read(from_server, output, sizeof(output));
+
   printf(CYAN_BOLD "Your PUB files:\n" COLOR_RESET);
   printf("%s", output);
 }
 
+/* Uploads local file to user's PUB.
+   Can optionally upload under different filename through char *pubname.
+   Sends "pubup::filename::contents" to server. Receives confirmation message.
+*/
 void pubup(char *localfile, char *pubname) {
-  // printf("%s\n", path);
   int fd = open(localfile, O_RDONLY);
   struct stat s;
   fstat(fd, &s);
-  int filesize = s.st_size;
+  int filesize = s.st_size; // to see if file exceeds FILE_SIZE
 
-  if (fd == -1) {
+  if (fd == -1) { // file doesn't exist
     printf(CYAN_BOLD "Couldn't find local file!\n" COLOR_RESET);
   }
-  else if (filesize > FILE_SIZE) {
+  else if (filesize > FILE_SIZE) { // file too large
     printf(CYAN_BOLD "File is too large!\n" COLOR_RESET);
   }
   else {
     char content[FILE_SIZE];
-    int bytes = read(fd, content, sizeof(content));
-    // printf("%s\n", content);
+    int bytes = read(fd, content, sizeof(content)); // stores file into "content"
     close(fd);
 
     char input[FILE_SIZE + 9] = "pubup::";
-    char output[BUFFER_SIZE];
-
-    if (strlen(pubname) == 0) {
+    if (strlen(pubname) == 0) { // if no new name specified
       strcat(input, localfile);
     }
-    else {
+    else { // specified new file name
       strcat(input, pubname);
     }
     strcat(input, "::");
     strcat(input, content);
     write(to_server, input, sizeof(input));
+
+    char output[BUFFER_SIZE];
     read(from_server, output, sizeof(output));
-    printf(CYAN_BOLD "%s" COLOR_RESET, output);
+    printf(CYAN_BOLD "%s" COLOR_RESET, output); // confirmation message
   }
 }
 
+/* Downloads specified file from user's PUB to current directory.
+   Can specify download file name through char *newfile.
+   Sends "pubdown::filename" to server. Receives file contents.
+*/
 void pubdown(char *pubfile, char *newfile) {
   char input[BUFFER_SIZE] = "pubdown::";
-  char content[FILE_SIZE];
   strcat(input, pubfile);
   write(to_server, input, sizeof(input));
-  read(from_server, content, sizeof(content));
+
+  char content[FILE_SIZE];
+  read(from_server, content, sizeof(content)); // receives file contents
 
   int fd;
-  if (strlen(newfile) == 0) {
+  if (strlen(newfile) == 0) { // no file name specified
     fd = open(pubfile, O_RDWR | O_CREAT | O_EXCL, 0700);
+    write(fd, content, strlen(content));
+    close(fd);
     printf(CYAN_BOLD "Successfully downloaded \"%s\"!\n" COLOR_RESET, pubfile);
   }
-  else {
+  else { // new file name specified
     fd = open(newfile, O_RDWR | O_CREAT | O_EXCL, 0700);
+    write(fd, content, strlen(content));
+    close(fd);
     printf(CYAN_BOLD "Successfully downloaded \"%s\" as \"%s\"!\n" COLOR_RESET, pubfile, newfile);
   }
-  write(fd, content, strlen(content));
-  close(fd);
 }
 
+/* Deletes file from user's PUB.
+   Sends "pubdel::filename" to server. Receives confirmation message.
+*/
 void pubdel(char *file) {
   char input[BUFFER_SIZE] = "pubdel::";
-  char output[BUFFER_SIZE];
   strcat(input, file);
   write(to_server, input, sizeof(input));
+
+  char output[BUFFER_SIZE];
   read(from_server, output, sizeof(output));
   printf(CYAN_BOLD "%s" COLOR_RESET, output);
 }
 
+/* Renames file in user's PUB.
+   Sends "pubrename::oldname::newname" to server. Receives confirmation message.
+*/
 void pubrename(char *oldname, char *newname) {
   char input[BUFFER_SIZE] = "pubrename::";
-  char output[BUFFER_SIZE];
   strcat(input, oldname);
   strcat(input, "::");
   strcat(input, newname);
   write(to_server, input, sizeof(input));
+
+  char output[BUFFER_SIZE];
   read(from_server, output, sizeof(output));
   printf(CYAN_BOLD "%s" COLOR_RESET, output);
 }
 
+/* Shows properties of user's PUB.
+   size property shows byte size of all files in PUB.
+   amt property shows number of files in PUB.
+   Sends "pubinfo::property" to server. Receives size or amt.
+*/
 void pubinfo(char *property) {
-  char output[BUFFER_SIZE];
   if (!strcmp(property, "size") || !strcmp(property, "amt")) {
     char input[BUFFER_SIZE] = "pubinfo::";
     strcat(input, property);
     write(to_server, input, sizeof(input));
+
+    char output[BUFFER_SIZE];
     read(from_server, output, sizeof(output));
     printf(CYAN_BOLD "%s" COLOR_RESET, output);
   }
@@ -137,36 +174,50 @@ void pubinfo(char *property) {
   }
 }
 
+/* Shows current PUB user.
+   Sends "pubuser" to server. Receives username.
+*/
 void pubuser() {
   char input[BUFFER_SIZE] = "pubuser";
-  char output[BUFFER_SIZE];
   write(to_server, input, sizeof(input));
+
+  char output[BUFFER_SIZE];
   read(from_server, output, sizeof(output));
   printf(CYAN_BOLD "%s" COLOR_RESET, output);
 }
 
+/* Changes PUB user.
+   If user already exists, switches to that user. Otherwise, creates new user.
+   Sends "pubswitch::username" to server. Receives confirmation message.
+*/
 void pubswitch(char *user) {
   char input[BUFFER_SIZE] = "pubswitch::";
-  char output[BUFFER_SIZE];
   strcat(input, user);
   write(to_server, input, sizeof(input));
+
+  char output[BUFFER_SIZE];
   read(from_server, output, sizeof(output));
   printf(CYAN_BOLD "%s\n" COLOR_RESET, output);
 }
 
+/* Removes a user's entire PUB. Asks for confirmation twice.
+   Sends "pubremove" to server. Receives confirmation message and exits client program.
+*/
 void pubremove() {
   printf(RED_BOLD "You are permanently deleting all your PUB files. Are you sure? (Yes/No) " COLOR_RESET);
   char answer[100];
   fgets(answer, sizeof(answer), stdin);
   *strchr(answer, '\n') = 0;
+
   if (!strcmp(answer, "Yes")) {
     printf(RED_BOLD "Confirm delete? (DELETE/NO) " COLOR_RESET);
     fgets(answer, sizeof(answer), stdin);
     *strchr(answer, '\n') = 0;
 
     if (!strcmp(answer, "DELETE")) {
-      char output[BUFFER_SIZE];
       write(to_server, "pubremove", sizeof("pubremove"));
+
+      char output[BUFFER_SIZE];
       read(from_server, output, sizeof(output));
       printf(CYAN_BOLD "%s" COLOR_RESET, output);
       printf("Exiting Pickupbox client...\n");
@@ -181,6 +232,9 @@ void pubremove() {
   }
 }
 
+
+/* Routes shell commands.
+*/
 void execute(char *command, int to_s, int from_s) {
   char **args = separate_args(command);
   to_server = to_s;
@@ -196,6 +250,9 @@ void execute(char *command, int to_s, int from_s) {
     exit_program();
   }
 
+  /* PUB COMMANDS
+     Makes sure there are correct number of args.
+  */
   else if (!strcmp(args[0], "pubhelp")) {
     pubhelp();
   }
@@ -267,6 +324,7 @@ void execute(char *command, int to_s, int from_s) {
     pubremove();
   }
 
+  /* All other commands */
   else {
     int piping = 0;
     for (int i = 0; args[i]; i++) {
@@ -334,11 +392,3 @@ void execute(char *command, int to_s, int from_s) {
   }
   free(args);
 }
-
-
-/*
-int main() {
-  execute(read_input());
-  return 0;
-}
-*/

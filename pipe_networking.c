@@ -14,8 +14,7 @@
 int server_setup() {
   int from_client;
   mkfifo("pubwkp", 0600);
-  from_client = open("pubwkp", O_RDONLY, 0);
-
+  from_client = open("pubwkp", O_RDONLY, 0); // blocks
   remove("pubwkp");
 
   return from_client;
@@ -71,7 +70,7 @@ int client_handshake(int *to_server) {
   //send pp name to server
   // printf("[client] handshake: connecting to wkp\n");
   *to_server = open( "pubwkp", O_WRONLY, 0);
-  if ( *to_server == -1 ) {
+  if ( *to_server == -1 ) { // if server isn't on
     printf(RED_TEXT "Couldn't connect to PUBServer\n" COLOR_RESET);
     exit(1);
   }
@@ -95,7 +94,7 @@ int client_handshake(int *to_server) {
   //send ACK to server
   write(*to_server, ACK, sizeof(buffer));
 
-  printf("Connected to PUBServer!\n");
+  printf("Connected to PUBServer!\n"); // confirmation message
 
   return from_server;
 }

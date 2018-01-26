@@ -5,5 +5,5 @@
 
 int to_server;
 int from_server;
-void login();
-void shell();
+void login(); // Prompts user for a username, sends to subserver.
+void shell(); // Starts the command shell.

@@ -1,5 +1,7 @@
 #include "startup.h"
 
+/* Prints inital PUB graphic and loading text.
+*/
 void startuptext(int i) {
   printf(BOLD "         +--------------+\n        /|             /|\n       / |            / |\n      *--*-----------*  |\n      |              |  |\n      | pickupbox    |  |\n      |              |  |\n   ...|  by Cesar M. |  +......\n  ....|    & Alex S. | /......\n .....|              |/......\n......*--------------*......\n" COLOR_RESET);
   if (i) {

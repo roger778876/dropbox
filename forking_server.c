@@ -4,6 +4,8 @@
 #include "startup.h"
 
 
+/* Removes "pubwkp" on server kill
+*/
 static void sighandler(int signo) {
   if (signo == SIGINT) {
     remove("pubwkp");
@@ -11,10 +13,13 @@ static void sighandler(int signo) {
   }
 }
 
+/* Loads server. Waits for first connection, 
+   then loops forever and waits for more connections.
+*/
 int main() {
   signal(SIGINT, sighandler);
-  startuptext(1);
-  root_folder();
+  startuptext(1); // server startuptext
+  root_folder(); // creates "users" folder
 
   int from_client;
   int parent;
@@ -33,6 +38,8 @@ int main() {
   }
 }
 
+/* Creates "users" folder where user PUBs and files are stored.
+*/
 void root_folder() {
   if (access("users", F_OK) != -1) {
     printf(GREEN_BOLD "[PUBServer]" COLOR_RESET);

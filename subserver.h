@@ -1,3 +1,5 @@
+#include <dirent.h>
+
 #define RED_TEXT "\x1B[31m"
 #define GREEN_TEXT "\x1b[32m"
 #define YELLOW_TEXT  "\x1B[33m"
