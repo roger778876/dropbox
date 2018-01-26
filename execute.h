@@ -13,6 +13,7 @@ void pubup(char *localfile, char *pubname);
 void pubdown(char *pubfile, char *newfile);
 void pubdel(char *pubfile);
 void pubrename(char *oldname, char *newname);
+void pubinfo(char *property);
 void pubuser();
 void pubswitch(char *user);
 void pubremove();

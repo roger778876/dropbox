@@ -28,6 +28,8 @@ void pubhelp() {
   printf(" - deletes PUB file from your PUB\n");
   printf(CYAN_TEXT "pubrename [PUB file] [new name]" COLOR_RESET);
   printf(" - renames PUB file\n");
+  printf(CYAN_TEXT "pubinfo [size/amt]" COLOR_RESET);
+  printf(" - shows properties of your PUB\n");
   printf(CYAN_TEXT "pubuser" COLOR_RESET);
   printf(" - shows current PUB user\n");
   printf(CYAN_TEXT "pubswitch [username]" COLOR_RESET);
@@ -119,6 +121,20 @@ void pubrename(char *oldname, char *newname) {
   write(to_server, input, sizeof(input));
   read(from_server, output, sizeof(output));
   printf(CYAN_BOLD "%s" COLOR_RESET, output);
+}
+
+void pubinfo(char *property) {
+  char output[BUFFER_SIZE];
+  if (!strcmp(property, "size") || !strcmp(property, "amt")) {
+    char input[BUFFER_SIZE] = "pubinfo::";
+    strcat(input, property);
+    write(to_server, input, sizeof(input));
+    read(from_server, output, sizeof(output));
+    printf(CYAN_BOLD "%s" COLOR_RESET, output);
+  }
+  else {
+    printf(CYAN_BOLD "Invalid PUB property!\n" COLOR_RESET);
+  }
 }
 
 void pubuser() {
@@ -226,6 +242,14 @@ void execute(char *command, int to_s, int from_s) {
     }
     else {
       pubrename(args[1], args[2]);
+    }
+  }
+  else if (!strcmp(args[0], "pubinfo")) {
+    if (!args[1]) {
+      printf(CYAN_BOLD "Please specify PUB property.\n" COLOR_RESET);
+    }
+    else {
+      pubinfo(args[1]);
     }
   }
   else if (!strcmp(args[0], "pubuser")) {

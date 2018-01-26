@@ -64,6 +64,11 @@ void subserver(int from_client) {
       server_pubrename(oldname, newname, result);
       write(to_client, result, sizeof(result));
     }
+    else if (!strncmp(request, "pubinfo::", (9 * sizeof(char)))) {
+      char *property = request + 9;
+      server_pubinfo(property, result);
+      write(to_client, result, sizeof(result));
+    }
     else if (!strcmp(request, "pubuser")) {
       strcat(result, username);
       strcat(result, "\n");
@@ -78,6 +83,7 @@ void subserver(int from_client) {
       write(to_client, result, sizeof(result));
       exit(0);
     }
+    memset(request, 0, strlen(request));
   }
 
   exit(0);
@@ -183,6 +189,45 @@ void server_pubrename(char *oldname, char *newname, char *out) {
     strcat(out, "File \"");
     strcat(out, oldname);
     strcat(out, "\" not found!\n");
+  }
+}
+
+void server_pubinfo(char *property, char *out) {
+  if (!strcmp(property, "size")) {
+    size_t bytes = 0;
+    DIR *d = opendir(filepath);
+    struct dirent *next_file;
+    struct stat s;
+
+    while ((next_file = readdir(d)) != NULL) {
+      if (strcmp(next_file->d_name, ".") && strcmp(next_file->d_name, "..")) {
+        stat(next_file->d_name, &s);
+        bytes += s.st_size;
+      }
+    }
+    closedir(d);
+    char size[24];
+    memset(size, 0, strlen(size));
+    sprintf(size, "%ld", bytes);
+    strcat(out, size);
+    strcat(out, " bytes\n");
+  }
+  else if (!strcmp(property, "amt")) {
+    int i = 0;
+    DIR *d = opendir(filepath);
+    struct dirent *next_file;
+
+    while ((next_file = readdir(d)) != NULL) {
+      if (strcmp(next_file->d_name, ".") && strcmp(next_file->d_name, "..")) {
+        i++;
+      }
+    }
+    closedir(d);
+    char size[24];
+    memset(size, 0, strlen(size));
+    sprintf(size, "%d", i);
+    strcat(out, size);
+    strcat(out, " files\n");
   }
 }
 
