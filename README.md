@@ -30,4 +30,4 @@ Pickupbox (PUB) behaves just like Dropbox; the user can upload, store, and downl
 **Cleaning up**
 1. Run ``make clean`` in terminal
 **OR**
-2. Run ``make bleach`` in terminal to delete the "users" folder.
+2. Run ``make bleach`` in terminal to delete the "users" folder as well.
